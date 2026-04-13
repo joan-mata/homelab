@@ -1,0 +1,25 @@
+services:
+  postgres_shared:
+    image: postgres:16-alpine
+    container_name: postgres_shared
+    restart: unless-stopped
+    env_file:
+      - ../../shared/.env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init/:/docker-entrypoint-initdb.d/:ro
+    networks:
+      - proxy-net
+    healthcheck:
+      # $$ prevents docker-compose interpolation; shell inside container resolves $POSTGRES_USER
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
+      interval: 10s
+      retries: 5
+
+volumes:
+  postgres_data:
+
+networks:
+  proxy-net:
+    external: true
+    name: proxy-net

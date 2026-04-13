@@ -1,0 +1,39 @@
+theme: dark
+
+server:
+  address: tcp://0.0.0.0:9091/
+
+log:
+  level: warn
+
+authentication_backend:
+  file:
+    path: /config/users_database.yml
+    password:
+      algorithm: bcrypt
+      iterations: 12
+
+session:
+  name: authelia_session
+  cookies:
+    - domain: joanmata.com
+      authelia_url: https://auth.joanmata.com
+      expiration: 12h
+      inactivity: 45m
+
+storage:
+  local:
+    # Volume mounted at /config/data — SQLite file lives inside
+    path: /config/data/db.sqlite3
+
+notifier:
+  filesystem:
+    filename: /config/notification.txt
+
+access_control:
+  default_policy: deny
+  rules:
+    - domain: "joanmata.com"
+      policy: bypass
+    - domain: "*.joanmata.com"
+      policy: one_factor

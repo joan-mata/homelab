@@ -1,0 +1,25 @@
+services:
+  authelia:
+    image: authelia/authelia:latest
+    container_name: authelia
+    restart: unless-stopped
+    volumes:
+      - ./configuration.yml:/config/configuration.yml:ro
+      - ./users_database.yml:/config/users_database.yml
+      - authelia_data:/config/data
+    env_file:
+      - ../../shared/.env
+    networks:
+      - proxy-net
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:9091/api/health"]
+      interval: 30s
+      retries: 3
+
+volumes:
+  authelia_data:
+
+networks:
+  proxy-net:
+    external: true
+    name: proxy-net

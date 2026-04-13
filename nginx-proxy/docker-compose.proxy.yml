@@ -1,0 +1,37 @@
+version: '3.8'
+
+# ─────────────────────────────────────────────────────────────────────────────
+# NGINX REVERSE PROXY — Centralizado para joanmata.com
+# Uso: docker compose -f docker-compose.proxy.yml up -d
+# ─────────────────────────────────────────────────────────────────────────────
+
+networks:
+  proxy-net:
+    name: proxy-net   # Red compartida con todos los servicios que deben ser accesibles
+    external: true
+
+services:
+  cv-proxy:
+    image: nginx:stable-alpine
+    container_name: cv-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./conf.d:/etc/nginx/conf.d:ro
+      # Descomentar cuando tengas certificados SSL:
+      # - ./certs/live:/etc/letsencrypt/live:ro
+      # - ./certs/archive:/etc/letsencrypt/archive:ro
+    networks:
+      - proxy-net
+    restart: always
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared-tunnel
+    restart: always
+    volumes:
+      - /Users/server_user/.cloudflared:/etc/cloudflared:ro
+    command: tunnel --config /etc/cloudflared/config.yml run
+    networks:
+      - proxy-net

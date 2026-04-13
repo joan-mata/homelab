@@ -1,0 +1,32 @@
+# ── Proyectos individuales (tienen su propio repo) ───────────────────────────
+assistant/
+bot_podcasts/
+Create_CVs/
+RefereeNotes/
+joanmata_web/
+f1_archive/
+gastia/
+RefStats/
+
+# ── Secretos y variables de entorno ──────────────────────────────────────────
+shared/.env
+shared/secrets/
+
+# ── Authelia — datos de usuarios y base de datos de sesiones ─────────────────
+infra/authelia/users_database.yml
+infra/authelia/data/
+infra/authelia/notification.txt
+
+# ── Datos de PostgreSQL (volúmenes locales si aplica) ────────────────────────
+*.sqlite3
+*.db
+
+# ── macOS ─────────────────────────────────────────────────────────────────────
+.DS_Store
+**/.DS_Store
+
+# ── Editors ───────────────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
