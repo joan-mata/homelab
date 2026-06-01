@@ -19,12 +19,23 @@ services:
       - "443:443"
     volumes:
       - ./conf.d:/etc/nginx/conf.d:ro
+      - /Users/server_user/Documents/VD_PAC3:/srv/static/VD/PAC3:ro
       # Descomentar cuando tengas certificados SSL:
       # - ./certs/live:/etc/letsencrypt/live:ro
       # - ./certs/archive:/etc/letsencrypt/archive:ro
     networks:
       - proxy-net
     restart: always
+
+  wakeup:
+    build: ../infra/wakeup
+    container_name: wakeup
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /Users/server_user/Documents:/Users/server_user/Documents:ro
+    networks:
+      - proxy-net
 
   cloudflared:
     image: cloudflare/cloudflared:latest

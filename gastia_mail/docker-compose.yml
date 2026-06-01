@@ -1,0 +1,30 @@
+services:
+  # MailDev: Captura todos los correos para inspeccionarlos en una web local
+  # Ideal para desarrollo y pruebas de recuperación de contraseña sin gastar dinero
+  maildev:
+    image: maildev/maildev
+    container_name: gastia-maildev
+    ports:
+      - "1080:80"   # Interfaz Web para ver correos
+      - "1025:25"   # Puerto SMTP para la app
+    restart: unless-stopped
+
+  # Docker Mailserver: Servidor de correo real para envío (Postfix/Dovecot)
+  mailserver:
+    image: ghcr.io/docker-mailserver/docker-mailserver:latest
+    container_name: gastia-mailserver
+    hostname: mail.gastia.com
+    domainname: gastia.com
+    ports:
+      - "587:587"   # SMTP con STARTTLS
+    environment:
+      - DMS_DEBUG=0
+      - OVERRIDE_HOSTNAME=mail.gastia.com
+      - ENABLE_SPAMASSASSIN=0
+      - ENABLE_CLAMAV=0
+      - ENABLE_FAIL2BAN=1
+      - POSTMASTER_ADDRESS=postmaster@gastia.com
+    volumes:
+      - ./mail-data:/var/mail
+      - ./config:/tmp/docker-mailserver
+    restart: unless-stopped
