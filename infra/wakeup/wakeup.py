@@ -74,6 +74,22 @@ SERVICES: dict[str, dict] = {
         "idle_minutes": 120,
         "group": "bot_podcasts",
     },
+    "nexum.joanmata.com": {
+        "name": "Nexum",
+        "dir": "/Users/server_user/Documents/nexum",
+        "file": "docker-compose.yml",
+        "health": "nexum-nginx",
+        "idle_minutes": 120,
+        "group": "nexum",
+    },
+    "trading.joanmata.com": {
+        "name": "Trading Dashboard",
+        "dir": "/Users/server_user/Documents/bot_trading",
+        "file": "docker-compose.yml",
+        "health": "bot-trading-dashboard",
+        "idle_minutes": 60,
+        "group": "trading",
+    },
 }
 
 # Per-group state: group → {"started_at": float, "starting": bool}
