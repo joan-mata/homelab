@@ -1,0 +1,17 @@
+name: nginx reload
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'nginx-proxy/conf.d/**'
+
+jobs:
+  reload:
+    runs-on: self-hosted
+    steps:
+      - name: Validar config nginx
+        run: docker exec cv-proxy nginx -t
+
+      - name: Reload sin downtime
+        run: docker exec cv-proxy nginx -s reload

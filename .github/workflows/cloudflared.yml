@@ -1,0 +1,17 @@
+name: cloudflared deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'cloudflared/config.yml'
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Aplicar config
+        run: cp /Users/server_user/Documents/cloudflared/config.yml ~/.cloudflared/config.yml
+
+      - name: Reiniciar cloudflared
+        run: docker restart cloudflared-tunnel

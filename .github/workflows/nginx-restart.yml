@@ -1,0 +1,17 @@
+name: nginx restart
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'nginx-proxy/docker-compose.proxy.yml'
+
+jobs:
+  restart:
+    runs-on: self-hosted
+    steps:
+      - name: Validar config nginx
+        run: docker exec cv-proxy nginx -t
+
+      - name: Recrear contenedor proxy
+        run: docker compose -f /Users/server_user/Documents/nginx-proxy/docker-compose.proxy.yml up -d --force-recreate cv-proxy
