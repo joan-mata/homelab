@@ -1,0 +1,52 @@
+name: Deploy nginx-proxy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'nginx-proxy/conf.d/**'
+      - 'nginx-proxy/docker-compose.proxy.yml'
+      - 'cloudflared/config.yml'
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Detectar cambios
+        id: changes
+        run: |
+          CHANGED=$(git diff HEAD~1 --name-only)
+          echo "$CHANGED"
+          echo "compose=$(echo "$CHANGED"    | grep -q 'nginx-proxy/docker-compose.proxy.yml' && echo true || echo false)" >> $GITHUB_OUTPUT
+          echo "confd=$(echo "$CHANGED"      | grep -q 'nginx-proxy/conf.d/'                 && echo true || echo false)" >> $GITHUB_OUTPUT
+          echo "cloudflared=$(echo "$CHANGED"| grep -q 'cloudflared/config.yml'              && echo true || echo false)" >> $GITHUB_OUTPUT
+
+      # ── nginx ─────────────────────────────────────────────────────────────
+      - name: Validar config nginx
+        if: steps.changes.outputs.confd == 'true' || steps.changes.outputs.compose == 'true'
+        run: docker exec cv-proxy nginx -t
+
+      - name: Reload nginx sin downtime (conf.d cambió)
+        if: steps.changes.outputs.confd == 'true' && steps.changes.outputs.compose == 'false'
+        run: |
+          docker exec cv-proxy nginx -s reload
+          echo "✓ nginx recargado"
+
+      - name: Restart proxy (docker-compose cambió)
+        if: steps.changes.outputs.compose == 'true'
+        run: |
+          cd nginx-proxy
+          docker compose -f docker-compose.proxy.yml up -d --force-recreate cv-proxy
+          echo "✓ proxy recreado"
+
+      # ── cloudflared ───────────────────────────────────────────────────────
+      - name: Aplicar config cloudflared
+        if: steps.changes.outputs.cloudflared == 'true'
+        run: |
+          cp cloudflared/config.yml ~/.cloudflared/config.yml
+          docker restart cloudflared-tunnel
+          echo "✓ cloudflared reiniciado"

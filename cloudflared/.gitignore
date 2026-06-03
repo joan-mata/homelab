@@ -1,0 +1,2 @@
+# Credenciales del tunnel — nunca en git
+*.json

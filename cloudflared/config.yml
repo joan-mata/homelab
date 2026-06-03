@@ -1,0 +1,38 @@
+tunnel: 9cbd37da-4422-4837-b780-c245ae2b432d
+credentials-file: /etc/cloudflared/9cbd37da-4422-4837-b780-c245ae2b432d.json
+
+ingress:
+  # All web traffic → nginx (cv-proxy) which routes by hostname
+  - hostname: joanmata.com
+    service: http://cv-proxy:80
+  - hostname: www.joanmata.com
+    service: http://cv-proxy:80
+  - hostname: cv.joanmata.com
+    service: http://cv-proxy:80
+  - hostname: refnotes.joanmata.com
+    service: http://cv-proxy:80
+  - hostname: f1.joanmata.com
+    service: http://cv-proxy:80
+  - hostname: n8n.joanmata.com
+    service: http://cv-proxy:80
+  - hostname: auth.joanmata.com
+    service: http://cv-proxy:80
+  - hostname: assistant.joanmata.com
+    service: http://cv-proxy:80
+  - hostname: podcasts.joanmata.com
+    service: http://cv-proxy:80
+  - hostname: gastia.joanmata.com
+    service: http://cv-proxy:80
+  - hostname: biblioteca.joanmata.com
+    service: http://cv-proxy:80
+  - hostname: nexum.joanmata.com
+    service: http://cv-proxy:80
+  - hostname: trading.joanmata.com
+    service: http://cv-proxy:80
+
+  # SSH access
+  - hostname: ssh.joanmata.com
+    service: ssh://localhost:22
+
+  # Catch-all
+  - service: http_status:404
