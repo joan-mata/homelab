@@ -14,12 +14,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: Detectar cambios
         id: changes
         run: |
-          CHANGED=$(git diff HEAD~1 --name-only)
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          BEFORE="${{ github.event.before }}"
+          AFTER="${{ github.sha }}"
+          # Fallback si before es el commit vacío (primer push)
+          if [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            CHANGED=$(git diff-tree --no-commit-id -r --name-only "$AFTER")
+          else
+            CHANGED=$(git diff --name-only "$BEFORE" "$AFTER")
+          fi
+          echo "Archivos cambiados:"
           echo "$CHANGED"
           echo "compose=$(echo "$CHANGED"    | grep -q 'nginx-proxy/docker-compose.proxy.yml' && echo true || echo false)" >> $GITHUB_OUTPUT
           echo "confd=$(echo "$CHANGED"      | grep -q 'nginx-proxy/conf.d/'                 && echo true || echo false)" >> $GITHUB_OUTPUT
