@@ -1,0 +1,39 @@
+[submodule "Create_CVs"]
+	path = Create_CVs
+	url = https://github.com/joan-mata/Create_CVs.git
+[submodule "RefStats"]
+	path = RefStats
+	url = https://github.com/joan-mata/RefStats.git
+[submodule "RefereeNotes"]
+	path = RefereeNotes
+	url = https://github.com/joan-mata/RefereeNotes.git
+[submodule "VD_PAC3"]
+	path = VD_PAC3
+	url = https://github.com/joan-mata/VD_PAC3.git
+[submodule "VD_PRACT"]
+	path = VD_PRACT
+	url = git@github.com:joan-mata/VD_PRACT.git
+[submodule "assistant"]
+	path = assistant
+	url = https://github.com/joan-mata/assistant.git
+[submodule "biblioteca"]
+	path = biblioteca
+	url = https://github.com/joan-mata/biblioteca.git
+[submodule "bot_podcasts"]
+	path = bot_podcasts
+	url = https://github.com/joan-mata/bot_podcasts.git
+[submodule "bot_trading"]
+	path = bot_trading
+	url = git@github.com:joan-mata/bot_trading.git
+[submodule "f1_archive"]
+	path = f1_archive
+	url = https://github.com/joan-mata/f1_archive.git
+[submodule "gastia"]
+	path = gastia
+	url = git@github.com:joan-mata/gastia.git
+[submodule "joanmata_web"]
+	path = joanmata_web
+	url = https://github.com/joan-mata/joanmata_web.git
+[submodule "nexum"]
+	path = nexum
+	url = git@github.com:joan-mata/nexum.git
