@@ -11,18 +11,17 @@ on:
 jobs:
   deploy:
     runs-on: self-hosted
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+    # El runner corre en el mismo Mac — usamos el repo en disco directamente
+    defaults:
+      run:
+        working-directory: /Users/server_user/Documents
 
+    steps:
       - name: Detectar cambios
         id: changes
         run: |
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           BEFORE="${{ github.event.before }}"
           AFTER="${{ github.sha }}"
-          # Fallback si before es el commit vacío (primer push)
           if [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
             CHANGED=$(git diff-tree --no-commit-id -r --name-only "$AFTER")
           else
@@ -48,8 +47,7 @@ jobs:
       - name: Restart proxy (docker-compose cambió)
         if: steps.changes.outputs.compose == 'true'
         run: |
-          cd nginx-proxy
-          docker compose -f docker-compose.proxy.yml up -d --force-recreate cv-proxy
+          docker compose -f nginx-proxy/docker-compose.proxy.yml up -d --force-recreate cv-proxy
           echo "✓ proxy recreado"
 
       # ── cloudflared ───────────────────────────────────────────────────────
