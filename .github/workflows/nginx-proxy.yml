@@ -19,14 +19,12 @@ jobs:
     steps:
       - name: Detectar cambios
         id: changes
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          BEFORE="${{ github.event.before }}"
-          AFTER="${{ github.sha }}"
-          if [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
-            CHANGED=$(git diff-tree --no-commit-id -r --name-only --ignore-submodules=all "$AFTER")
-          else
-            CHANGED=$(git diff --name-only --ignore-submodules=all "$BEFORE" "$AFTER")
-          fi
+          # Usa la API de GitHub — evita git local con submodulos SSH que cuelga
+          CHANGED=$(gh api repos/${{ github.repository }}/compare/${{ github.event.before }}...${{ github.sha }} \
+            --jq '.files[].filename' 2>/dev/null || echo "")
           echo "Archivos cambiados:"
           echo "$CHANGED"
           echo "compose=$(echo "$CHANGED"    | grep -q 'nginx-proxy/docker-compose.proxy.yml' && echo true || echo false)" >> $GITHUB_OUTPUT
