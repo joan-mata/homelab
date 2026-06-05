@@ -19,8 +19,7 @@ services:
       - "443:443"
     volumes:
       - ./conf.d:/etc/nginx/conf.d:ro
-      - /Users/server_user/Documents/VD_PAC3:/srv/static/VD/PAC3:ro
-      - /Users/server_user/Documents/VD_PRACT/web:/srv/static/VD/PRACT:ro
+      - /Users/server_user/Documents/static:/srv/static:ro
       # Descomentar cuando tengas certificados SSL:
       # - ./certs/live:/etc/letsencrypt/live:ro
       # - ./certs/archive:/etc/letsencrypt/archive:ro
