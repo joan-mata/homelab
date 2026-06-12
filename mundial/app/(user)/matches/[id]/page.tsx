@@ -11,6 +11,18 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { MatchEvent } from '@/lib/football-api';
 import Link from 'next/link';
 
+function liveScore(events: MatchEvent[], homeId: string | null, awayId: string | null) {
+  let home = 0, away = 0;
+  for (const e of events) {
+    if (e.type === 'GOAL' || e.type === 'PENALTY') {
+      if (e.teamId === homeId) home++; else away++;
+    } else if (e.type === 'OWN_GOAL') {
+      if (e.teamId === homeId) away++; else home++;
+    }
+  }
+  return { home, away };
+}
+
 export default async function MatchPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const session = await auth();
@@ -65,13 +77,29 @@ export default async function MatchPage({ params }: { params: Promise<{ id: stri
           <span>{stageLabel(match.stage)}</span>
           {match.group && <span>· Grupo {match.group.replace(/^GROUP_/, '')}</span>}
           {match.venueCity && <span>· {match.venueCity}</span>}
+          {match.status === 'LIVE' && (
+            <span className="flex items-center gap-1 text-red-500 font-semibold uppercase tracking-wide">
+              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+              En vivo
+            </span>
+          )}
         </div>
         <h1 className="text-2xl font-bold">
           {homeTeam ? `${homeTeam.flag} ${homeTeam.name}` : (match.homeTeamId ?? 'Por determinar')}
           {' vs '}
           {awayTeam ? `${awayTeam.name} ${awayTeam.flag}` : (match.awayTeamId ?? 'Por determinar')}
         </h1>
-        <p className="text-muted-foreground mt-1">{formatKickoff(match.kickoff)}</p>
+        {match.status === 'LIVE' && Array.isArray(match.events) && (() => {
+          const s = liveScore(match.events as MatchEvent[], match.homeTeamId, match.awayTeamId);
+          return (
+            <div className="mt-2 text-3xl font-bold tabular-nums">
+              {s.home} – {s.away}
+            </div>
+          );
+        })()}
+        {match.status !== 'LIVE' && (
+          <p className="text-muted-foreground mt-1">{formatKickoff(match.kickoff)}</p>
+        )}
       </div>
 
       {hasResult && (

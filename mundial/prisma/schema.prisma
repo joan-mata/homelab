@@ -103,7 +103,9 @@ model Match {
   status     MatchStatus @default(SCHEDULED)
   externalId String?     @unique
   resolved   Boolean     @default(false)
-  events     Json?
+  events              Json?
+  apifootballId       Int?
+  apifootballHomeTeamId Int?
   updatedAt  DateTime    @updatedAt
 
   predictions Prediction[]
