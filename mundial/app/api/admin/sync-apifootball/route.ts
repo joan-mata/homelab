@@ -4,10 +4,13 @@ import { db } from '@/lib/db';
 import { fetchWCFixtures } from '@/lib/apifootball';
 import { NextResponse } from 'next/server';
 
-export async function POST() {
-  const session = await auth();
-  if (!session || session.user.role !== 'ADMIN') {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+export async function POST(req: Request) {
+  const cronAuth = req.headers.get('Authorization') === `Bearer ${process.env.CRON_SECRET}`;
+  if (!cronAuth) {
+    const session = await auth();
+    if (!session || session.user.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
   }
 
   const data = await fetchWCFixtures();
