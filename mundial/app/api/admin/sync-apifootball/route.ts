@@ -24,6 +24,7 @@ export async function POST(req: Request) {
   let mapped = 0;
 
   for (const date of dates) {
+    await new Promise(r => setTimeout(r, 1100)); // 1 req/sec limit on free plan
     let data;
     try {
       data = await fetchFixturesByDate(date);
