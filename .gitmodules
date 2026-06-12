@@ -37,3 +37,6 @@
 [submodule "nexum"]
 	path = nexum
 	url = git@github.com:joan-mata/nexum.git
+[submodule "mundial"]
+	path = mundial
+	url = git@github.com:joan-mata/mundial.git
