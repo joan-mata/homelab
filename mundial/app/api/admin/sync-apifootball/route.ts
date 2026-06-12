@@ -3,10 +3,10 @@ import { auth } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { fetchFixturesByDate } from '@/lib/apifootball';
 import { NextResponse } from 'next/server';
+import { checkCronSecret } from '@/lib/cron-auth';
 
 export async function POST(req: Request) {
-  const cronAuth = req.headers.get('Authorization') === `Bearer ${process.env.CRON_SECRET}`;
-  if (!cronAuth) {
+  if (!checkCronSecret(req)) {
     const session = await auth();
     if (!session || session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });

@@ -6,8 +6,13 @@ export function initCron(): void {
   if (initialized || process.env.NODE_ENV === 'test') return;
   initialized = true;
 
+  const secret = process.env.CRON_SECRET;
+  if (!secret) {
+    console.error('[cron] CRON_SECRET not set — jobs NOT initialized');
+    return;
+  }
+
   const base = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
-  const secret = process.env.CRON_SECRET ?? '';
 
   const hit = (path: string) =>
     fetch(`${base}${path}`, {

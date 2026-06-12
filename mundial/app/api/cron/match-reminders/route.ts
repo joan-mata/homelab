@@ -2,10 +2,8 @@ export const dynamic = 'force-dynamic';
 import { db } from '@/lib/db';
 import { remindBeforeKickoff } from '@/lib/telegram';
 import { NextResponse } from 'next/server';
+import { checkCronSecret } from '@/lib/cron-auth';
 
-function checkCronSecret(req: Request): boolean {
-  return req.headers.get('Authorization') === `Bearer ${process.env.CRON_SECRET}`;
-}
 
 export async function POST(req: Request) {
   if (!checkCronSecret(req)) {

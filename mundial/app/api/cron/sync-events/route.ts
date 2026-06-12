@@ -3,14 +3,12 @@ import { db } from '@/lib/db';
 import { fetchFixtureEvents, parseAfEvents, calcIntervalMinutes } from '@/lib/apifootball';
 import { Prisma } from '@prisma/client';
 import { NextResponse } from 'next/server';
+import { checkCronSecret } from '@/lib/cron-auth';
 
 const SETTING_LAST_SYNC     = 'apifootball_last_sync';
 const SETTING_INTERVAL_DATE = 'apifootball_interval_date';
 const SETTING_INTERVAL_MIN  = 'apifootball_interval_minutes';
 
-function checkCronSecret(req: Request): boolean {
-  return req.headers.get('Authorization') === `Bearer ${process.env.CRON_SECRET}`;
-}
 
 async function getSetting(key: string): Promise<string | null> {
   const s = await db.setting.findUnique({ where: { key } });
