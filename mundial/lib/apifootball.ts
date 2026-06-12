@@ -15,7 +15,7 @@ async function apiFetch(path: string) {
   return res.json();
 }
 
-export const fetchWCFixtures     = () => apiFetch(`/fixtures?league=${LEAGUE_ID}&season=${SEASON}`);
+export const fetchFixturesByDate = (date: string) => apiFetch(`/fixtures?date=${date}&league=${LEAGUE_ID}&timezone=UTC`);
 export const fetchFixtureEvents  = (id: number) => apiFetch(`/fixtures/events?fixture=${id}`);
 
 // Returns optimal polling interval in minutes for today's matches.
