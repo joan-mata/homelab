@@ -202,10 +202,10 @@ export default async function MatchPage({ params }: { params: Promise<{ id: stri
                 const pred = allPredictions.find(p => p.userId === u.id);
                 const isMe = u.id === userId;
                 return (
-                  <div key={u.id} className={`flex items-center justify-between py-2 ${isMe ? 'font-medium' : ''}`}>
-                    <span>{u.name}{isMe && ' (tú)'}</span>
+                  <div key={u.id} className={`flex items-center justify-between gap-3 py-2 ${isMe ? 'font-medium' : ''}`}>
+                    <span className="truncate min-w-0">{u.name}{isMe && ' (tú)'}</span>
                     {pred ? (
-                      <span className="font-mono">
+                      <span className="font-mono shrink-0">
                         {pred.homeScore}–{pred.awayScore}
                         {pred.points !== null && (
                           <span className={`ml-2 text-xs ${pred.points >= 3 ? 'text-green-600' : pred.points >= 1 ? 'text-yellow-600' : 'text-muted-foreground'}`}>
@@ -214,7 +214,7 @@ export default async function MatchPage({ params }: { params: Promise<{ id: stri
                         )}
                       </span>
                     ) : (
-                      <span className="text-muted-foreground text-xs italic">Sin predicción</span>
+                      <span className="text-muted-foreground text-xs italic shrink-0">Sin predicción</span>
                     )}
                   </div>
                 );
