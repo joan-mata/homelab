@@ -1,0 +1,207 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum Stage {
+  GROUP
+  ROUND_OF_32
+  ROUND_OF_16
+  QUARTER
+  SEMI
+  THIRD
+  FINAL
+}
+
+enum MatchStatus {
+  SCHEDULED
+  LIVE
+  FINISHED
+  POSTPONED
+}
+
+enum KnockoutMethod {
+  EXTRA_TIME
+  PENALTIES
+}
+
+enum ExtraBetType {
+  WORLD_CUP_WINNER
+  TOP_SCORER
+  BEST_GOALKEEPER
+}
+
+enum AuditAction {
+  RESULT_SET
+  RESULT_CLEARED
+  EXTENSION_GRANTED
+  EXTENSION_REVOKED
+  RECALCULATE_ALL
+  USER_CREATED
+  USER_DEACTIVATED
+  EXTRA_BET_RESOLVED
+  FAVORITE_RESET
+  PASSWORD_RESET
+  USER_DELETED
+}
+
+model User {
+  id                 String   @id @default(cuid())
+  username           String   @unique
+  name               String
+  email              String?  @unique
+  passwordHash       String
+  mustChangePassword Boolean  @default(true)
+  telegramChatId     String?
+  telegramToken      String?
+  role               Role     @default(USER)
+  favoriteTeam       String?
+  active             Boolean  @default(true)
+  createdAt          DateTime @default(now())
+
+  predictions      Prediction[]
+  extraBets        ExtraBet[]
+  extensions       PredictionExtension[]
+  auditActions     AuditLog[]            @relation("AuditAdmin")
+  teamPickEntries  TeamPickEntry[]
+}
+
+model Team {
+  id    String @id
+  name  String
+  group String
+  flag  String
+}
+
+model Match {
+  id         String  @id @default(cuid())
+  homeTeamId String?
+  awayTeamId String?
+  homeLabel  String?
+  awayLabel  String?
+  kickoff    DateTime
+  stage      Stage
+  group      String?
+  venueCity  String  @default("")
+
+  homeScore   Int?
+  awayScore   Int?
+  etHomeScore Int?
+  etAwayScore Int?
+
+  knockoutMethod   KnockoutMethod?
+  knockoutWinnerId String?
+
+  status     MatchStatus @default(SCHEDULED)
+  externalId String?     @unique
+  resolved   Boolean     @default(false)
+  events     Json?
+  updatedAt  DateTime    @updatedAt
+
+  predictions Prediction[]
+  extensions  PredictionExtension[]
+  auditLogs   AuditLog[]
+}
+
+model Prediction {
+  id      String @id @default(cuid())
+  userId  String
+  matchId String
+
+  homeScore Int
+  awayScore Int
+
+  knockoutWinnerId String?
+  knockoutMethod   KnockoutMethod?
+  etHomeScore      Int?
+  etAwayScore      Int?
+
+  basePoints     Int?
+  knockoutPoints Int?
+  closestBonus   Int  @default(0)
+  points         Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  match Match @relation(fields: [matchId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, matchId])
+}
+
+model PredictionExtension {
+  id          String   @id @default(cuid())
+  matchId     String
+  userId      String?
+  newDeadline DateTime
+  reason      String?
+  createdAt   DateTime @default(now())
+  createdById String
+
+  match Match @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  user  User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@unique([matchId, userId])
+}
+
+model ExtraBet {
+  id       String       @id @default(cuid())
+  userId   String
+  type     ExtraBetType
+  value    String
+  points   Int?
+  resolved Boolean      @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, type])
+}
+
+model TeamPickContest {
+  id        String   @id @default(cuid())
+  name      String
+  pts       Int
+  teamIds   String[] // array of TLAs
+  open      Boolean  @default(true)
+  resolved  Boolean  @default(false)
+  winnerId  String?
+  createdAt DateTime @default(now())
+  entries   TeamPickEntry[]
+}
+
+model TeamPickEntry {
+  id        String          @id @default(cuid())
+  contestId String
+  userId    String
+  teamIds   String[]
+  points    Int?
+  contest   TeamPickContest @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([contestId, userId])
+}
+
+model Setting {
+  key   String @id
+  value String
+}
+
+model AuditLog {
+  id        String      @id @default(cuid())
+  action    AuditAction
+  adminId   String
+  matchId   String?
+  detail    Json
+  createdAt DateTime    @default(now())
+
+  admin User  @relation("AuditAdmin", fields: [adminId], references: [id])
+  match Match? @relation(fields: [matchId], references: [id], onDelete: SetNull)
+}
