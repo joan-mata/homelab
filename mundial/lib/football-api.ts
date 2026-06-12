@@ -80,7 +80,7 @@ export function mapStage(stage: string): 'GROUP' | 'ROUND_OF_32' | 'ROUND_OF_16'
 const TLA_TO_ISO2: Record<string, string> = {
   ALG: 'DZ', ARG: 'AR', AUS: 'AU', AUT: 'AT', BEL: 'BE', BIH: 'BA',
   BRA: 'BR', CAN: 'CA', CIV: 'CI', COD: 'CD', COL: 'CO', CPV: 'CV',
-  CRO: 'HR', CUR: 'CW', CUW: 'CW', CZE: 'CZ', ECU: 'EC', EGY: 'EG',
+  CRO: 'HR', CUW: 'CW', CZE: 'CZ', ECU: 'EC', EGY: 'EG',
   ENG: 'GB', ESP: 'ES', FRA: 'FR', GER: 'DE', GHA: 'GH', HAI: 'HT',
   IRN: 'IR', IRQ: 'IQ', JOR: 'JO', JPN: 'JP', KOR: 'KR', KSA: 'SA',
   MAR: 'MA', MEX: 'MX', NED: 'NL', NOR: 'NO', NZL: 'NZ', PAN: 'PA',
@@ -116,9 +116,17 @@ export function labelText(label: string): string {
   return `${ordinal} Grupo${groups.length > 1 ? 's' : ''} ${groups}`;
 }
 
+// Subdivision flags that can't be derived from ISO-2 regional indicators
+const SUBDIVISION_FLAGS: Record<string, string> = {
+  ENG: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+  SCO: '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
+  WAL: '🏴󠁧󠁢󠁷󠁬󠁳󠁿',
+};
+
 export function countryFlag(tla: string): string {
-  const iso2 = TLA_TO_ISO2[tla.toUpperCase()];
+  const upper = tla.toUpperCase();
+  if (SUBDIVISION_FLAGS[upper]) return SUBDIVISION_FLAGS[upper];
+  const iso2 = TLA_TO_ISO2[upper];
   if (iso2) return iso2Flag(iso2);
-  // Fallback: use first 2 letters if no mapping
-  return iso2Flag(tla.slice(0, 2).toUpperCase());
+  return iso2Flag(upper.slice(0, 2));
 }
